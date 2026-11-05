@@ -48,8 +48,14 @@ public class RegistrationServlet extends HttpServlet {
                 .build();
         try {
             authService.register(registrationDto);
+            resp.sendRedirect(req.getContextPath() + "/login");
+        } catch (IllegalArgumentException e) {
+            req.setAttribute("errorMessage", e.getMessage());
+            req.setAttribute("faculties", facultyService.getAllFaculties());
+            req.setAttribute("cities", cityService.getAllCities());
+            req.getRequestDispatcher("/jsp/registration-form.jsp").forward(req, resp);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Внутренняя ошибка базы данных", e);
         }
     }
 }

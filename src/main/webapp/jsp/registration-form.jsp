@@ -13,8 +13,13 @@
     </script>
 </head>
 <body>
+<c:if test="${not empty errorMessage}">
+    <div>
+            ${errorMessage}
+    </div>
+</c:if>
 <form action="${pageContext.request.contextPath}/registration" method="post">
-    <input type="text" name="email" placeholder="Введите логин" required>
+    <input type="text" name="email" placeholder="Введите почту" required>
     <input type="password" name="password" placeholder="Введите пароль" required>
     <input type="text" name="fullName" placeholder="Введите ФИО" required>
     
@@ -42,7 +47,7 @@
             <option value="${city.id}">${city.name}</option>
         </c:forEach>
     </select>
-    <button type="submit">sign up</button>
+    <button type="submit">Зарегестрироваться</button>
 </form>
 
 <script>
