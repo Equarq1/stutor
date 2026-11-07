@@ -14,13 +14,12 @@ public class User {
     private String email;
     private String hashPassword;
     private String fullName;
-    private Integer course;
     private String about;
     private String contact;
     private LocalDateTime createdAt;
     private Role role;
     private UserStatus userStatus;
-    private Integer cityId;
-    private Integer groupId;
-    private Integer avatarId;
+    private City city;
+    private StudyGroup group;
+    private FileInfo avatar;
 }

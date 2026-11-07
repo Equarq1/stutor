@@ -9,7 +9,7 @@ import java.util.List;
 
 public class FacultyRepositoryJdbcImpl implements FacultyRepository{
     private final DataSource dataSource;
-    private static final String SQL_SELECT_ALL = "SELECT * FROM faculties";
+    private static final String SQL_SELECT_ALL = "SELECT (id, name) FROM faculties";
 
     public FacultyRepositoryJdbcImpl(DataSource dataSource) {
         this.dataSource = dataSource;

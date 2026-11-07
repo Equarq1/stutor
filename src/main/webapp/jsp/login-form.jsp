@@ -3,12 +3,14 @@
 
 <html>
 <head>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/main.css">
     <title>Title</title>
 </head>
 
 <body>
+<jsp:include page="/jsp/header.jsp"/>
 <c:if test="${not empty errorMessage}">
-    <div>
+    <div class="error-message">
             ${errorMessage}
     </div>
 </c:if>

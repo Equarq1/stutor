@@ -2,6 +2,8 @@ package org.example.service;
 
 import org.example.dto.LoginDto;
 import org.example.dto.RegistrationDto;
+import org.example.models.City;
+import org.example.models.StudyGroup;
 import org.example.models.User;
 import org.example.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -31,13 +33,20 @@ public class AuthServiceImpl implements AuthService {
         if ((userRepository.findByEmail(email).isPresent())) {
             throw new IllegalArgumentException("Пользователь с такой почтой уже существует");
         }
+        City city = City.builder()
+                .id(registrationDto.getCityId())
+                .build();
+
+        StudyGroup group = StudyGroup.builder()
+                .id(registrationDto.getGroupId())
+                .build();
 
         User user = User.builder()
                 .email(email)
                 .hashPassword(passwordEncoder.encode(registrationDto.getPassword()))
                 .fullName(registrationDto.getFullName())
-                .cityId(registrationDto.getCityId())
-                .groupId(registrationDto.getGroupId())
+                .city(city)
+                .group(group)
                 .build();
         userRepository.save(user);
     }
@@ -46,7 +55,7 @@ public class AuthServiceImpl implements AuthService {
     public User authenticate(LoginDto loginDto) throws SQLException {
         User user = userRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new IllegalArgumentException("Неверный логин или пароль"));
         if (!passwordEncoder.matches(loginDto.getPassword(), user.getHashPassword())) {
-            throw new IllegalArgumentException("Неверный email или пароль");
+            throw new IllegalArgumentException("Неверный логин или пароль");
         }
         return user;
     }

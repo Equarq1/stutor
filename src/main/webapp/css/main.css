@@ -1,0 +1,123 @@
+/* =========================================
+   БАЗОВЫЕ НАСТРОЙКИ
+   ========================================= */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background-color: #f4f7f6; /* Мягкий светло-серый фон */
+    color: #333;
+    line-height: 1.6;
+}
+
+
+header {
+    display: flex;
+    justify-content: space-between; /* Раскидываем 3 nav-блока по краям и центру */
+    align-items: center;
+    background-color: #ffffff;
+    padding: 15px 40px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05); /* Легкая тень снизу */
+}
+
+header nav a {
+    text-decoration: none;
+    color: #495057;
+    font-weight: 500;
+    margin: 0 10px;
+    transition: color 0.2s ease-in-out;
+}
+
+header nav a:hover {
+    color: #0d6efd; /* Синий цвет при наведении */
+}
+
+/* Логотип */
+.logo a {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #0d6efd;
+    margin: 0;
+}
+
+/* =========================================
+   ГЛАВНАЯ СТРАНИЦА (MAIN)
+   ========================================= */
+main {
+    padding: 50px 20px;
+    text-align: center;
+}
+
+main h1 {
+    margin-bottom: 15px;
+    color: #212529;
+}
+
+main p {
+    color: #6c757d;
+    font-size: 1.1rem;
+}
+
+/* =========================================
+   ФОРМА РЕГИСТРАЦИИ И АВТОРИЗАЦИИ
+   ========================================= */
+form {
+    max-width: 400px;
+    margin: 40px auto; /* Центрируем форму по горизонтали */
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 8px; /* Скругленные углы */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column; /* Элементы формы идут сверху вниз */
+    gap: 15px; /* Отступы между инпутами */
+}
+
+input, select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 5px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+input:focus, select:focus {
+    border-color: #0d6efd; /* Синяя рамка при вводе текста */
+}
+
+button {
+    padding: 12px;
+    background-color: #0d6efd;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 10px;
+}
+
+button:hover {
+    background-color: #0b5ed7; /* Чуть более темный синий при наведении */
+}
+
+/* =========================================
+   ОШИБКИ В ФОРМЕ
+   ========================================= */
+.error-message {
+    max-width: 400px;
+    margin: 40px auto 0 auto;
+    padding: 15px;
+    background-color: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+    border-radius: 5px;
+    text-align: center;
+}

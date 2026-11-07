@@ -30,12 +30,14 @@ public class CustomServletContextListener implements ServletContextListener {
         FacultyRepository facultyRepository = new FacultyRepositoryJdbcImpl(dataSource);
         CityRepository cityRepository = new CityRepositoryJdbcImpl(dataSource);
         StudyGroupRepository studyGroupRepository = new StudyGroupRepositoryJdbcImpl(dataSource);
+        OfferRepository offerRepository = new OfferRepositoryJdbcImpl(dataSource);
 
         // Сервисы
         AuthService authService = new AuthServiceImpl(userRepository);
         FacultyService facultyService = new FacultyServiceImpl(facultyRepository);
         CityService cityService = new CityServiceImpl(cityRepository);
         StudyGroupService studyGroupService = new StudyGroupServiceImpl(studyGroupRepository);
+        OfferService offerService = new OfferServiceImpl(offerRepository);
 
         // Добавляем репозитории в контекст
 
@@ -43,15 +45,14 @@ public class CustomServletContextListener implements ServletContextListener {
         servletContext.setAttribute("facultyRepository", facultyRepository);
         servletContext.setAttribute("cityRepository", cityRepository);
         servletContext.setAttribute("studyGroupRepository", studyGroupRepository);
-
+        servletContext.setAttribute("offerRepository", offerRepository);
 
         // Добавляем сервисы в контекст
         servletContext.setAttribute("authService", authService);
         servletContext.setAttribute("facultyService", facultyService);
         servletContext.setAttribute("cityService", cityService);
         servletContext.setAttribute("studyGroupService", studyGroupService);
-
-
+        servletContext.setAttribute("offerService", offerService);
 
 
     }

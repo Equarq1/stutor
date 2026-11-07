@@ -12,7 +12,7 @@ import java.util.List;
 
 public class CityRepositoryJdbcImpl implements CityRepository {
     private final DataSource dataSource;
-    private static final String SQL_SELECT_ALL = "SELECT * FROM cities";
+    private static final String SQL_SELECT_ALL = "SELECT (id, name) FROM cities";
 
     public CityRepositoryJdbcImpl(DataSource dataSource) {
         this.dataSource = dataSource;

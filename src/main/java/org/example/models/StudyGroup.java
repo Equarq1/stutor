@@ -8,6 +8,6 @@ import lombok.Data;
 public class StudyGroup {
     private Integer id;
     private String name;
-    private Integer facultyId;
+    private Faculty faculty;
     private Integer admissionYear;
 }

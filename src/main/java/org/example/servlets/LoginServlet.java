@@ -39,7 +39,7 @@ public class LoginServlet extends HttpServlet {
             );
             HttpSession session = req.getSession();
             session.setAttribute("user", user);
-            resp.sendRedirect(req.getContextPath() + "");
+            resp.sendRedirect(req.getContextPath() + "/home");
         } catch (IllegalArgumentException e) {
             req.setAttribute("errorMessage", e.getMessage());
             req.getRequestDispatcher("/jsp/login-form.jsp").forward(req, resp);
