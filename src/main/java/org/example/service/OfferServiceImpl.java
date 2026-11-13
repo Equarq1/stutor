@@ -1,6 +1,6 @@
 package org.example.service;
 
-import org.example.dto.OfferDto;
+import org.example.dto.CreateOfferDto;
 import org.example.models.Category;
 import org.example.models.FileInfo;
 import org.example.models.Offer;
@@ -37,26 +37,26 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
-    public void saveOffer(OfferDto offerDto) throws SQLException {
+    public void save(CreateOfferDto createOfferDto) throws SQLException {
         User user = User.builder()
-                .id(offerDto.getAuthorId())
+                .id(createOfferDto.getAuthorId())
                 .build();
 
         Category category = Category.builder()
-                .id(offerDto.getCategoryId())
+                .id(createOfferDto.getCategoryId())
                 .build();
 
         FileInfo attachment = FileInfo.builder()
-                .id(offerDto.getAttachmentId())
+                .id(createOfferDto.getAttachmentId())
                 .build();
 
         offerRepository.save(
                 Offer.builder()
-                        .title(offerDto.getTitle())
-                        .description(offerDto.getDescription())
-                        .price(offerDto.getPrice())
+                        .title(createOfferDto.getTitle())
+                        .description(createOfferDto.getDescription())
+                        .price(createOfferDto.getPrice())
                         .createdAt(LocalDateTime.now())
-                        .format(offerDto.getFormat())
+                        .format(createOfferDto.getFormat())
                         .status(OfferStatus.ACTIVE)
                         .author(user)
                         .category(category)

@@ -127,7 +127,7 @@ public class OfferRepositoryJdbcImpl implements OfferRepository {
                 offerPreparedStatement.setLong(7, offer.getAuthor().getId());
                 offerPreparedStatement.setInt(8, offer.getCategory().getId());
 
-                if (offer.getAttachment() != null) {
+                if (offer.getAttachment() != null && offer.getAttachment().getId() != null) {
                     offerPreparedStatement.setLong(9, offer.getAttachment().getId());
                 } else {
                     offerPreparedStatement.setNull(9, Types.BIGINT);

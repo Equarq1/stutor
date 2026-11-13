@@ -3,14 +3,13 @@ package org.example.dto;
 import lombok.Builder;
 import lombok.Data;
 import org.example.models.enums.OfferFormat;
-import org.example.models.enums.OfferStatus;
 
 import java.math.BigDecimal;
 import java.util.List;
 
 @Data
 @Builder
-public class OfferDto {
+public class CreateOfferDto {
     private String title;
     private String description;
     private BigDecimal price;
