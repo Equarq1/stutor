@@ -15,7 +15,7 @@
   <div class="author-info">
     <c:choose>
       <c:when test="${not empty offer.author.avatar}">
-        <img src="${pageContext.request.contextPath}/uploads/${offer.author.avatar.storageFileName}" width="50" height="50" style="border-radius: 50%;">
+        <img src="${pageContext.request.contextPath}/file?id=${offer.author.avatar.id}" width="50" height="50">
       </c:when>
       <c:otherwise>
         <img src="${pageContext.request.contextPath}/img/default-avatar.png" width="50" height="50">
@@ -48,12 +48,10 @@
   </c:if>
 
   <c:if test="${not empty offer.attachment}">
-    <div class="offer-attachment">
-      <h3>Материалы:</h3>
-      <a href="${pageContext.request.contextPath}/download?fileId=${offer.attachment.id}">
-        Скачать файл (${offer.attachment.originalFileName})
-      </a>
-    </div>
+      <div class="offer-attachment">
+        <h3>Прикрепленные материалы:</h3>
+        <a href="${pageContext.request.contextPath}/file?id=${offer.attachment.id}">Скачать ${offer.attachment.originalFileName}</a>
+      </div>
   </c:if>
 </div>
 </body>

@@ -1,10 +1,7 @@
 package org.example.service;
 
 import org.example.dto.CreateOfferDto;
-import org.example.models.Category;
-import org.example.models.FileInfo;
-import org.example.models.Offer;
-import org.example.models.User;
+import org.example.models.*;
 import org.example.models.enums.OfferStatus;
 import org.example.repository.OfferRepository;
 
@@ -50,6 +47,13 @@ public class OfferServiceImpl implements OfferService {
                 .id(createOfferDto.getAttachmentId())
                 .build();
 
+        List<Subject> subjects = null;
+        if (createOfferDto.getSubjectIds() != null && !createOfferDto.getSubjectIds().isEmpty()) {
+            subjects = createOfferDto.getSubjectIds().stream()
+                    .map(id -> Subject.builder().id(id).build())
+                    .toList();
+        }
+
         offerRepository.save(
                 Offer.builder()
                         .title(createOfferDto.getTitle())
@@ -60,6 +64,7 @@ public class OfferServiceImpl implements OfferService {
                         .status(OfferStatus.ACTIVE)
                         .author(user)
                         .category(category)
+                        .subjects(subjects)
                         .attachment(attachment)
                         .build()
         );

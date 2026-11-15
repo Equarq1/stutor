@@ -68,7 +68,6 @@ public class CreateOfferServlet extends HttpServlet {
                     .build();
             try {
                 attachmentId = fileInfoService.save(filePart.getInputStream(), fileDto);
-                resp.sendRedirect(req.getContextPath() + "/home");
             } catch (Exception e) {
                 throw new RuntimeException("Ошибка при сохранении прикрепленного файла", e);
             }
@@ -88,6 +87,7 @@ public class CreateOfferServlet extends HttpServlet {
 
         try {
             offerService.save(createOfferDto);
+            resp.sendRedirect(req.getContextPath() + "/home");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }

@@ -39,15 +39,10 @@ public class OfferServlet extends HttpServlet {
             req.setAttribute("offer", offer);
             req.getRequestDispatcher("/jsp/offer-page.jsp").forward(req, resp);
         }
+
         catch (NumberFormatException e) {
             resp.sendRedirect(req.getContextPath() + "/offers");
         }
 
-
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        super.doPost(req, resp);
     }
 }

@@ -5,10 +5,7 @@
     import org.springframework.security.core.parameters.P;
 
     import javax.sql.DataSource;
-    import java.sql.Connection;
-    import java.sql.PreparedStatement;
-    import java.sql.ResultSet;
-    import java.sql.SQLException;
+    import java.sql.*;
     import java.util.ArrayList;
     import java.util.List;
 
@@ -40,7 +37,7 @@
         @Override
         public void save(FileInfo fileInfo) throws SQLException {
             try (Connection connection = dataSource.getConnection();
-                PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT)) {
+                PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT, Statement.RETURN_GENERATED_KEYS)) {
                 preparedStatement.setString(1, fileInfo.getStorageFileName());
                 preparedStatement.setString(2, fileInfo.getOriginalFileName());
                 preparedStatement.setString(3, fileInfo.getType());
