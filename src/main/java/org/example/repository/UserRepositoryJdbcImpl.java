@@ -26,10 +26,10 @@ public class UserRepositoryJdbcImpl implements UserRepository{
                f.storage_file_name as file_name, f.id as file_id,
                fac.name as faculty_name, fac.id as faculty_id
         FROM users AS u
-        JOIN cities AS c ON c.id = u.city_id
-        JOIN study_groups AS g ON g.id = u.group_id
+        LEFT JOIN cities AS c ON c.id = u.city_id
+        LEFT JOIN study_groups AS g ON g.id = u.group_id
         LEFT JOIN file_info AS f ON f.id = u.avatar_id
-        JOIN faculties AS fac ON fac.id = g.faculty_id
+        LEFT JOIN faculties AS fac ON fac.id = g.faculty_id
         WHERE u.email = ?    
         """;
 
@@ -93,22 +93,31 @@ public class UserRepositoryJdbcImpl implements UserRepository{
                     .build();
         }
 
-        City city = City.builder()
-                .id(resultSet.getInt("city_id"))
-                .name(resultSet.getString("city_name"))
-                .build();
+        City city = null;
 
-        Faculty faculty = Faculty.builder()
-                .id(resultSet.getInt("faculty_id"))
-                .name(resultSet.getString("faculty_name"))
-                .build();
+        if (resultSet.getObject("city_id") != null) {
+            city = City.builder()
+                    .id(resultSet.getInt("city_id"))
+                    .name(resultSet.getString("city_name"))
+                    .build();
+        }
 
-        StudyGroup studyGroup = StudyGroup.builder()
-                .id(resultSet.getInt("group_id"))
-                .name(resultSet.getString("group_name"))
-                .faculty(faculty)
-                .admissionYear(resultSet.getInt("admission_year"))
-                .build();
+        StudyGroup studyGroup = null;
+
+        if (resultSet.getObject("group_id") != null) {
+            Faculty faculty = Faculty.builder()
+                    .id(resultSet.getInt("faculty_id"))
+                    .name(resultSet.getString("faculty_name"))
+                    .build();
+
+            studyGroup = StudyGroup.builder()
+                    .id(resultSet.getInt("group_id"))
+                    .name(resultSet.getString("group_name"))
+                    .faculty(faculty)
+                    .admissionYear(resultSet.getInt("admission_year"))
+                    .build();
+        }
+
 
         return User.builder()
                         .id(resultSet.getLong("id"))

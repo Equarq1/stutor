@@ -16,6 +16,7 @@
     <title>Document</title>
 </head>
 <body>
+<jsp:include page="/jsp/header.jsp"/>
 <form class="create-offer-form" action="${pageContext.request.contextPath}/create-offer" method="post" enctype="multipart/form-data">
     <input type="text" name="title" placeholder="Введите заголовок объявления">
     <div class="offer-description">

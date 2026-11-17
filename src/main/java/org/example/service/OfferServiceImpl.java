@@ -29,7 +29,7 @@ public class OfferServiceImpl implements OfferService {
     }
 
     @Override
-    public Offer getOfferById(int id) {
+    public Offer getOfferById(Long id) {
         return offerRepository.findOfferById(id);
     }
 
@@ -70,5 +70,48 @@ public class OfferServiceImpl implements OfferService {
         );
     }
 
+    @Override
+    public void deleteById(Long id) {
+        offerRepository.deleteById(id);
+    }
 
+    @Override
+    public List<Offer> getOffersByUserId(Long id) {
+        return offerRepository.findByUserId(id);
+    }
+
+    @Override
+    public void changeStatus(Long id, OfferStatus status) {
+        offerRepository.changeStatus(id, status);
+    }
+
+    @Override
+    public void update(Long offerId, CreateOfferDto dto) throws SQLException {
+        Category category = Category.builder().id(dto.getCategoryId()).build();
+
+        FileInfo attachment = null;
+        if (dto.getAttachmentId() != null) {
+            attachment = FileInfo.builder().id(dto.getAttachmentId()).build();
+        }
+
+        List<Subject> subjects = null;
+        if (dto.getSubjectIds() != null && !dto.getSubjectIds().isEmpty()) {
+            subjects = dto.getSubjectIds().stream()
+                    .map(id -> Subject.builder().id(id).build())
+                    .toList();
+        }
+
+        Offer offer = Offer.builder()
+                .id(offerId)
+                .title(dto.getTitle())
+                .description(dto.getDescription())
+                .price(dto.getPrice())
+                .format(dto.getFormat())
+                .category(category)
+                .attachment(attachment)
+                .subjects(subjects)
+                .build();
+
+        offerRepository.update(offer);
+    }
 }

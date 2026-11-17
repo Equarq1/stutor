@@ -30,7 +30,7 @@ public class OfferServlet extends HttpServlet {
         }
 
         try {
-            Offer offer = offerService.getOfferById(Integer.parseInt(idParam));
+            Offer offer = offerService.getOfferById(Long.parseLong(idParam));
             if (offer == null ) {
                 resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Объявление не найдено");
                 return;

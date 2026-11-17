@@ -48,6 +48,18 @@ public class OfferRepositoryJdbcImpl implements OfferRepository {
         INSERT INTO offer_subjects (offer_id, subject_id) VALUES (?, ?)
         """;
 
+    private static final String SQL_DELETE_OFFER_BY_ID = "DELETE FROM offers WHERE id = ?";
+
+    private static final String SQL_SELECT_OFFER_BY_USER_ID = SQL_BASE + " WHERE o.author_id = ?";
+
+    private static final String SQL_UPDATE_STATUS = "UPDATE offers SET status = ? WHERE id = ?";
+
+    private static final String SQL_UPDATE_OFFER = """
+    UPDATE offers SET title = ?, description = ?, price = ?, format = ?, category_id = ?, attachment_id = ? 
+    WHERE id = ?
+    """;
+    private static final String SQL_DELETE_OFFER_SUBJECTS = "DELETE FROM offer_subjects WHERE offer_id = ?";
+
     public OfferRepositoryJdbcImpl(DataSource dataSource) {
         this.dataSource = dataSource;
     }
@@ -109,6 +121,47 @@ public class OfferRepositoryJdbcImpl implements OfferRepository {
         }
     }
 
+    @Override
+    public void deleteById(long id) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_DELETE_OFFER_BY_ID)
+        ) {
+            preparedStatement.setLong(1, id);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<Offer> findByUserId(long id) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_OFFER_BY_USER_ID)) {
+            preparedStatement.setLong(1, id);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            List<Offer> list = new ArrayList<>();
+            while (resultSet.next()) {
+                Offer offer = mapRowToOffer(resultSet);
+                offer.setSubjects(getSubjectsForOffer(offer.getId(), connection));
+                list.add(offer);
+            }
+            return list;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public void changeStatus(Long id, OfferStatus status) {
+        try (Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_STATUS)) {
+            preparedStatement.setString(1, status.name());
+            preparedStatement.setLong(2, id);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Override
     public void save(Offer offer) {
@@ -211,6 +264,54 @@ public class OfferRepositoryJdbcImpl implements OfferRepository {
                 .build();
     }
 
+
+    @Override
+    public void update(Offer offer) {
+        try (Connection connection = dataSource.getConnection()) {
+            connection.setAutoCommit(false);
+
+            try (PreparedStatement updateStmt = connection.prepareStatement(SQL_UPDATE_OFFER);
+                 PreparedStatement deleteSubjectsStmt = connection.prepareStatement(SQL_DELETE_OFFER_SUBJECTS);
+                 PreparedStatement insertSubjectsStmt = connection.prepareStatement(SQL_INSERT_OFFER_SUBJECT)) {
+
+                updateStmt.setString(1, offer.getTitle());
+                updateStmt.setString(2, offer.getDescription());
+                updateStmt.setBigDecimal(3, offer.getPrice());
+                updateStmt.setString(4, offer.getFormat().name());
+                updateStmt.setInt(5, offer.getCategory().getId());
+
+                if (offer.getAttachment() != null && offer.getAttachment().getId() != null) {
+                    updateStmt.setLong(6, offer.getAttachment().getId());
+                } else {
+                    updateStmt.setNull(6, Types.BIGINT);
+                }
+                updateStmt.setLong(7, offer.getId());
+                updateStmt.executeUpdate();
+
+                deleteSubjectsStmt.setLong(1, offer.getId());
+                deleteSubjectsStmt.executeUpdate();
+
+                if (offer.getSubjects() != null && !offer.getSubjects().isEmpty()) {
+                    for (Subject subject : offer.getSubjects()) {
+                        insertSubjectsStmt.setLong(1, offer.getId());
+                        insertSubjectsStmt.setInt(2, subject.getId());
+                        insertSubjectsStmt.addBatch();
+                    }
+                    insertSubjectsStmt.executeBatch();
+                }
+
+                connection.commit();
+            } catch (SQLException e) {
+                connection.rollback();
+                throw new RuntimeException("Ошибка при обновлении объявления. Транзакция отменена.", e);
+            } finally {
+                connection.setAutoCommit(true);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка базы данных", e);
+        }
+    }
+
     private List<Subject> getSubjectsForOffer(Long offerId, Connection connection) throws SQLException {
         List<Subject> subjects = new ArrayList<>();
         try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_SUBJECTS)) {
@@ -236,5 +337,7 @@ public class OfferRepositoryJdbcImpl implements OfferRepository {
             throw new RuntimeException(e);
         }
         return subjects;
+
+
     }
 }
