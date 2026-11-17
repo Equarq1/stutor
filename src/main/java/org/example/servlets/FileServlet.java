@@ -10,9 +10,11 @@ import org.example.models.FileInfo;
 import org.example.service.FileInfoService;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @WebServlet("/file")
-public class FileServlet extends HttpServlet {
+public class    FileServlet extends HttpServlet {
 
     private FileInfoService fileInfoService;
 
@@ -28,7 +30,12 @@ public class FileServlet extends HttpServlet {
 
         if (fileInfo != null) {
             resp.setContentType(fileInfo.getType());
-            resp.setHeader("Content-Disposition", "attachment; filename=\"" + fileInfo.getOriginalFileName() + "\"");
+            String encodedFilename = URLEncoder.encode(fileInfo.getOriginalFileName(), StandardCharsets.UTF_8)
+                    .replaceAll("\\+", "%20");
+
+            String disposition = fileInfo.getType().startsWith("image/") ? "inline" : "attachment";
+
+            resp.setHeader("Content-Disposition", disposition + "; filename*=UTF-8''" + encodedFilename);
             fileInfoService.writeFileFromStorage(id, resp.getOutputStream());
         }
     }

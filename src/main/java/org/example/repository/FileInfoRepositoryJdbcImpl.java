@@ -64,6 +64,7 @@
                         .storageFileName(resultSet.getString("storage_file_name"))
                         .size(resultSet.getLong("size"))
                         .type(resultSet.getString("type"))
+                        .createdAt(resultSet.getTimestamp("created_at").toLocalDateTime())
                         .build();
             }
             catch (SQLException e) {

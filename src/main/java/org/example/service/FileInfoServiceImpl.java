@@ -19,6 +19,11 @@ public class FileInfoServiceImpl implements FileInfoService {
 
     public FileInfoServiceImpl(FileInfoRepository fileInfoRepository) {
         this.fileInfoRepository = fileInfoRepository;
+        try {
+            Files.createDirectories(Paths.get(PATH_TO_STORAGE_DIRECTORY));
+        } catch (IOException e) {
+            throw new RuntimeException("Не удалось создать директорию для хранения файлов", e);
+        }
     }
 
 
