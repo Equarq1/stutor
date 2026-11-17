@@ -19,11 +19,11 @@ public class FacultyRepositoryJdbcImpl implements FacultyRepository{
 
     @Override
     public List<Faculty> findAll() {
-        try (Connection connection = dataSource.getConnection()
+        try (Connection connection = dataSource.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(SQL_SELECT_ALL);
         ) {
             List<Faculty> list = new ArrayList<>();
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(SQL_SELECT_ALL);
 
             while (resultSet.next()) {
                 Faculty faculty = Faculty.builder()

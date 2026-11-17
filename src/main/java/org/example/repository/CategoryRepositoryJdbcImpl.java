@@ -22,9 +22,10 @@ public class CategoryRepositoryJdbcImpl implements CategoryRepository {
     @Override
     public List<Category> findAll() {
         try (Connection connection = dataSource.getConnection();
-        Statement statement = connection.createStatement()) {
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(SQL_SELECT_ALL)) {
+
             List<Category> list = new ArrayList<>();
-            ResultSet resultSet = statement.executeQuery(SQL_SELECT_ALL);
             while (resultSet.next()) {
                 list.add(Category.builder()
                     .id(resultSet.getInt("id"))

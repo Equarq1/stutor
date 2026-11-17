@@ -20,9 +20,9 @@ public class CityRepositoryJdbcImpl implements CityRepository {
 
     @Override
     public List<City> findAll() {
-        try (Connection connection = dataSource.getConnection()) {
-            Statement statement = connection.createStatement();
-            ResultSet resultSet = statement.executeQuery(SQL_SELECT_ALL);
+        try (Connection connection = dataSource.getConnection();
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(SQL_SELECT_ALL);) {
             List<City> list = new ArrayList<>();
             while (resultSet.next()) {
                 City city = City.builder()

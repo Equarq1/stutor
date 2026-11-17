@@ -11,6 +11,7 @@ import org.example.models.StudyGroup;
 import org.example.service.StudyGroupService;
 
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.Year;
 import java.util.List;
 
@@ -28,8 +29,10 @@ public class GroupApiServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         int facultyId = Integer.parseInt(req.getParameter("facultyId"));
         int course = Integer.parseInt(req.getParameter("course"));
-        int currentYear = Year.now().getValue();
-        int admissionYear = currentYear - course + 1;
+
+        LocalDate now = LocalDate.now();
+        int academicStartYear = (now.getMonthValue() < 9) ? now.getYear() - 1 : now.getYear();
+        int admissionYear = academicStartYear - course + 1;
 
         List<StudyGroup> studyGroups = studyGroupService.getStudyGroupsByFacultyAndYear(facultyId, admissionYear);
         resp.setContentType("application/json");

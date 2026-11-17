@@ -316,21 +316,22 @@ public class OfferRepositoryJdbcImpl implements OfferRepository {
         List<Subject> subjects = new ArrayList<>();
         try (PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_SUBJECTS)) {
             preparedStatement.setLong(1, offerId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
 
-                Faculty faculty = Faculty.builder()
-                        .id(resultSet.getInt("faculty_id"))
-                        .name(resultSet.getString("faculty_name"))
-                        .build();
-                subjects.add(
-                        Subject.builder()
-                                .id(resultSet.getInt("id"))
-                                .name(resultSet.getString("name"))
-                                .course(resultSet.getInt("course"))
-                                .faculty(faculty)
-                                .build()
-                );
+                    Faculty faculty = Faculty.builder()
+                            .id(resultSet.getInt("faculty_id"))
+                            .name(resultSet.getString("faculty_name"))
+                            .build();
+                    subjects.add(
+                            Subject.builder()
+                                    .id(resultSet.getInt("id"))
+                                    .name(resultSet.getString("name"))
+                                    .course(resultSet.getInt("course"))
+                                    .faculty(faculty)
+                                    .build()
+                    );
+                }
             }
         }
         catch (SQLException e) {

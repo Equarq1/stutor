@@ -5,6 +5,7 @@ import org.example.dto.RegistrationDto;
 import org.example.models.City;
 import org.example.models.StudyGroup;
 import org.example.models.User;
+import org.example.models.enums.UserStatus;
 import org.example.repository.UserRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -54,8 +55,13 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public User authenticate(LoginDto loginDto) throws SQLException {
         User user = userRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new IllegalArgumentException("Неверный логин или пароль"));
+
         if (!passwordEncoder.matches(loginDto.getPassword(), user.getHashPassword())) {
             throw new IllegalArgumentException("Неверный логин или пароль");
+        }
+
+        if (user.getUserStatus() == UserStatus.BLOCKED) {
+            throw new IllegalArgumentException("Ваш аккаунт заблокирован");
         }
         return user;
     }

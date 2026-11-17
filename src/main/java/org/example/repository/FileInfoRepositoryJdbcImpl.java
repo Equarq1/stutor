@@ -24,10 +24,11 @@
         public FileInfo findById(Long id) {
             try (Connection connection = dataSource.getConnection();
                  PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_BY_ID)) {
-                    preparedStatement.setLong(1, id);
-                    ResultSet resultSet = preparedStatement.executeQuery();
-                if (resultSet.next()) return rowMapperToFileInfo(resultSet);
-                return null;
+                preparedStatement.setLong(1, id);
+                try (ResultSet resultSet = preparedStatement.executeQuery();) {
+                    if (resultSet.next()) return rowMapperToFileInfo(resultSet);
+                    return null;
+                }
             }
             catch (SQLException e) {
                 throw new RuntimeException(e);

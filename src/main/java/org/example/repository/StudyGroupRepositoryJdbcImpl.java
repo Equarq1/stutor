@@ -29,12 +29,13 @@ public class StudyGroupRepositoryJdbcImpl implements  StudyGroupRepository {
             List<StudyGroup> list = new ArrayList<>();
             preparedStatement.setInt(1, year);
             preparedStatement.setInt(2, facultyId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                StudyGroup studyGroup = rowMapperToStudyGroup(resultSet);
-                list.add(studyGroup);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
+                    StudyGroup studyGroup = rowMapperToStudyGroup(resultSet);
+                    list.add(studyGroup);
+                }
+                return list;
             }
-            return list;
         }
         catch (SQLException e) {
             throw new RuntimeException(e);

@@ -49,12 +49,13 @@ public class UserRepositoryJdbcImpl implements UserRepository{
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_BY_EMAIL)) {
             preparedStatement.setString(1, email);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.next()) {
-                return Optional.of(rowMapperToUser(resultSet));
-            }
-            return Optional.empty();
 
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return Optional.of(rowMapperToUser(resultSet));
+                }
+                return Optional.empty();
+            }
         }
         catch (SQLException e) {
             throw new RuntimeException(e);

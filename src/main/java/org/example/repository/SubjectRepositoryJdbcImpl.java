@@ -28,8 +28,8 @@ public class SubjectRepositoryJdbcImpl implements SubjectRepository {
     @Override
     public List<Subject> findAll() {
         try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement()) {
-            ResultSet resultSet = statement.executeQuery(SQL_SELECT_ALL);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(SQL_SELECT_ALL);) {
             List<Subject> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(rowMapperToSubject(resultSet));
@@ -47,12 +47,13 @@ public class SubjectRepositoryJdbcImpl implements SubjectRepository {
              PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_BY_FACULTY_ID_AND_COURSE)) {
             preparedStatement.setInt(1, facultyId);
             preparedStatement.setInt(2, course);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            List<Subject> list = new ArrayList<>();
-            while (resultSet.next()) {
-                list.add(rowMapperToSubject(resultSet));
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                List<Subject> list = new ArrayList<>();
+                while (resultSet.next()) {
+                    list.add(rowMapperToSubject(resultSet));
+                }
+                return list;
             }
-            return list;
         }
         catch (SQLException e) {
             throw new RuntimeException(e);
