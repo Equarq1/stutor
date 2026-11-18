@@ -5,10 +5,7 @@ import org.example.models.enums.Role;
 import org.example.models.enums.UserStatus;
 
 import javax.sql.DataSource;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -19,7 +16,7 @@ public class UserRepositoryJdbcImpl implements UserRepository{
         this.dataSource = dataSource;
     }
 
-    private static final String SQL_SELECT_BY_EMAIL = """
+    private static final String SQL_SELECT_BY_SOMETHING = """
         SELECT u.id, u.email, u.password_hash, u.full_name, u.about, u.contact, u.created_at, u.role, u.status,
                c.name as city_name, c.id as city_id,
                g.name as group_name, g.id as group_id, g.admission_year,
@@ -30,13 +27,16 @@ public class UserRepositoryJdbcImpl implements UserRepository{
         LEFT JOIN study_groups AS g ON g.id = u.group_id
         LEFT JOIN file_info AS f ON f.id = u.avatar_id
         LEFT JOIN faculties AS fac ON fac.id = g.faculty_id
-        WHERE u.email = ?    
         """;
+
+    private static final String SQL_SELECT_BY_EMAIL = SQL_SELECT_BY_SOMETHING + "WHERE u.email = ?";
+    private static final String SQL_SELECT_BY_ID = SQL_SELECT_BY_SOMETHING + "WHERE u.id = ?";
 
     private static final String SQL_INSERT_INTO_USERS = "INSERT into users" +
             " (email, password_hash, full_name, about," +
             "contact, created_at, role, status, city_id, group_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
+    private static final String SQL_UPDATE_PROFILE = "UPDATE users SET about = ?, contact = ?, avatar_id = ? WHERE id = ?";
 
 
     @Override
@@ -137,4 +137,42 @@ public class UserRepositoryJdbcImpl implements UserRepository{
 
     }
 
+
+    @Override
+    public void updateProfile(User user) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_UPDATE_PROFILE)) {
+
+            ps.setString(1, user.getAbout());
+            ps.setString(2, user.getContact());
+
+            if (user.getAvatar() != null && user.getAvatar().getId() != null) {
+                ps.setLong(3, user.getAvatar().getId());
+            } else {
+                ps.setNull(3, Types.BIGINT);
+            }
+
+            ps.setLong(4, user.getId());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка обновления профиля", e);
+        }
+    }
+
+    @Override
+    public Optional<User> findById(Long id) {
+        try (Connection connection = dataSource.getConnection();
+        PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_BY_ID)) {
+            preparedStatement.setLong(1, id);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return Optional.of(rowMapperToUser(resultSet));
+                }
+                return Optional.empty();
+            }
+        }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

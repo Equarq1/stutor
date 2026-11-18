@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.dto.CreateOfferDto;
 import org.example.models.Offer;
+import org.example.models.User;
 import org.example.models.enums.OfferStatus;
 
 import java.sql.SQLException;

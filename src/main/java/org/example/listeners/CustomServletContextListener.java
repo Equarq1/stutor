@@ -44,6 +44,7 @@ public class CustomServletContextListener implements ServletContextListener {
         CategoryService categoryService = new CategoryServiceImpl(categoryRepository);
         SubjectService subjectService = new SubjectServiceImpl(subjectRepository);
         FileInfoService fileInfoService = new FileInfoServiceImpl(fileInfoRepository);
+        UserService userService = new UserServiceImpl(userRepository);
 
         // Добавляем репозитории в контекст
 
@@ -65,7 +66,7 @@ public class CustomServletContextListener implements ServletContextListener {
         servletContext.setAttribute("categoryService", categoryService);
         servletContext.setAttribute("subjectService", subjectService);
         servletContext.setAttribute("fileInfoService", fileInfoService);
-
+        servletContext.setAttribute("userService", userService);
 
     }
 }

@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface UserRepository extends CrudRepository<User> {
     List<User> findAll();
     Optional<User> findByEmail(String email);
+    void updateProfile(User user);
+    Optional<User> findById(Long id);
 }
