@@ -1,2 +1,3 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<% response.sendRedirect(request.getContextPath() + "/home"); %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<c:redirect url="/home"/>
