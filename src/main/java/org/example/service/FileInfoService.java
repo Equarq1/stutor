@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.dto.CreateFileInfoDto;
 import org.example.models.FileInfo;
+import org.example.models.User;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,5 +12,6 @@ public interface FileInfoService {
     Long save(InputStream file, CreateFileInfoDto createFileInfoDto) throws SQLException;
     FileInfo getFileInfoById(long id);
     void writeFileFromStorage(Long fileId, OutputStream outputStream);
+    boolean canUserAccess(Long fileId, User user);
 
 }

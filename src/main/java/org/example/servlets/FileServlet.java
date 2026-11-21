@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.example.models.FileInfo;
+import org.example.models.User;
 import org.example.service.FileInfoService;
 
 import java.io.IOException;
@@ -27,6 +28,12 @@ public class    FileServlet extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Long id = Long.parseLong(req.getParameter("id"));
         FileInfo fileInfo = fileInfoService.getFileInfoById(id);
+        User currentUser = (User) req.getSession().getAttribute("user");
+
+        if (!fileInfoService.canUserAccess(id, currentUser)) {
+            resp.sendError(HttpServletResponse.SC_FORBIDDEN);
+            return;
+        }
 
         if (fileInfo != null) {
             resp.setContentType(fileInfo.getType());

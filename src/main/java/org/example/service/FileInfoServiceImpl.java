@@ -2,6 +2,8 @@ package org.example.service;
 
 import org.example.dto.CreateFileInfoDto;
 import org.example.models.FileInfo;
+import org.example.models.User;
+import org.example.models.enums.Role;
 import org.example.repository.FileInfoRepository;
 
 import java.io.File;
@@ -70,5 +72,13 @@ public class FileInfoServiceImpl implements FileInfoService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public boolean canUserAccess(Long fileId, User user) {
+        if (user.getRole() == Role.ADMIN) {
+            return true;
+        }
+        return fileInfoRepository.existsAccessibleForUser(fileId, user.getId());
     }
 }

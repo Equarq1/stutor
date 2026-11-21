@@ -28,8 +28,14 @@ public class OfferStatusServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Long id = Long.parseLong(req.getParameter("id"));
         OfferStatus status = OfferStatus.valueOf(req.getParameter("newStatus"));
+
         User currentUser = (User) req.getSession().getAttribute("user");
         Offer offer = offerService.getOfferById(id);
+
+        if (offer == null) {
+            resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Объявление не найдено");
+            return;
+        }
 
         if (!Objects.equals(currentUser.getId(), offer.getAuthor().getId())) {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Нет прав на редактирование");

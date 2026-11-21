@@ -4,4 +4,5 @@ import org.example.models.FileInfo;
 
 public interface FileInfoRepository extends CrudRepository<FileInfo> {
     FileInfo findById(Long id);
+    boolean existsAccessibleForUser(Long fileId, Long userId);
 }

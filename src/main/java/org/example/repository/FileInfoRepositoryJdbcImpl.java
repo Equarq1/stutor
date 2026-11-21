@@ -1,19 +1,26 @@
     package org.example.repository;
 
     import org.example.models.FileInfo;
-    import org.springframework.jdbc.core.RowMapper;
-    import org.springframework.security.core.parameters.P;
-
     import javax.sql.DataSource;
     import java.sql.*;
-    import java.util.ArrayList;
-    import java.util.List;
 
     public class FileInfoRepositoryJdbcImpl implements FileInfoRepository {
         private final DataSource dataSource;
         private static final String SQL_INSERT = "INSERT INTO file_info (storage_file_name, original_file_name, type, size, created_at)" +
                 "VALUES (?, ?, ?, ?, NOW())";
         private static final String SQL_SELECT_BY_ID = "SELECT * from file_info WHERE id = ?";
+
+        private static final String SQL_EXISTS_ACCESSIBLE = """
+    SELECT EXISTS (
+        SELECT 1 FROM users WHERE avatar_id = ?
+        UNION ALL
+        SELECT 1 FROM offers WHERE attachment_id = ?
+        UNION ALL
+        SELECT 1 FROM requests r
+        JOIN offers o ON o.id = r.offer_id
+        WHERE r.attachment_id = ? AND (r.student_id = ? OR o.author_id = ?)
+    )
+    """;
 
         public FileInfoRepositoryJdbcImpl(DataSource dataSource) {
             this.dataSource = dataSource;
@@ -68,6 +75,23 @@
                         .build();
             }
             catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        @Override
+        public boolean existsAccessibleForUser(Long fileId, Long userId) {
+            try (Connection connection = dataSource.getConnection();
+                 PreparedStatement ps = connection.prepareStatement(SQL_EXISTS_ACCESSIBLE)) {
+                ps.setLong(1, fileId);
+                ps.setLong(2, fileId);
+                ps.setLong(3, fileId);
+                ps.setLong(4, userId);
+                ps.setLong(5, userId);
+                try (ResultSet rs = ps.executeQuery()) {
+                    return rs.next() && rs.getBoolean(1);
+                }
+            } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
         }
