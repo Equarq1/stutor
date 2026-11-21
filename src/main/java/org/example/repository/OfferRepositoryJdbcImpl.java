@@ -6,9 +6,7 @@ import org.example.models.enums.OfferStatus;
 
 import javax.sql.DataSource;
 import java.sql.*;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class OfferRepositoryJdbcImpl implements OfferRepository {
     private final DataSource dataSource;
@@ -58,7 +56,11 @@ public class OfferRepositoryJdbcImpl implements OfferRepository {
     UPDATE offers SET title = ?, description = ?, price = ?, format = ?, category_id = ?, attachment_id = ? 
     WHERE id = ?
     """;
-    private static final String SQL_DELETE_OFFER_SUBJECTS = "DELETE FROM offer_subjects WHERE offer_id = ?";
+    private static final String SQL_SELECT_SUBJECT_IDS =
+            "SELECT subject_id FROM offer_subjects WHERE offer_id = ?";
+
+    private static final String SQL_DELETE_OFFER_SUBJECT =
+            "DELETE FROM offer_subjects WHERE offer_id = ? AND subject_id = ?";
 
     public OfferRepositoryJdbcImpl(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -138,14 +140,15 @@ public class OfferRepositoryJdbcImpl implements OfferRepository {
         try (Connection connection = dataSource.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_OFFER_BY_USER_ID)) {
             preparedStatement.setLong(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            List<Offer> list = new ArrayList<>();
-            while (resultSet.next()) {
-                Offer offer = mapRowToOffer(resultSet);
-                offer.setSubjects(getSubjectsForOffer(offer.getId(), connection));
-                list.add(offer);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                List<Offer> list = new ArrayList<>();
+                while (resultSet.next()) {
+                    Offer offer = mapRowToOffer(resultSet);
+                    offer.setSubjects(getSubjectsForOffer(offer.getId(), connection));
+                    list.add(offer);
+                }
+                return list;
             }
-            return list;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -270,34 +273,60 @@ public class OfferRepositoryJdbcImpl implements OfferRepository {
         try (Connection connection = dataSource.getConnection()) {
             connection.setAutoCommit(false);
 
-            try (PreparedStatement updateStmt = connection.prepareStatement(SQL_UPDATE_OFFER);
-                 PreparedStatement deleteSubjectsStmt = connection.prepareStatement(SQL_DELETE_OFFER_SUBJECTS);
-                 PreparedStatement insertSubjectsStmt = connection.prepareStatement(SQL_INSERT_OFFER_SUBJECT)) {
+            try {
+                try (PreparedStatement updateStmt = connection.prepareStatement(SQL_UPDATE_OFFER)) {
+                    updateStmt.setString(1, offer.getTitle());
+                    updateStmt.setString(2, offer.getDescription());
+                    updateStmt.setBigDecimal(3, offer.getPrice());
+                    updateStmt.setString(4, offer.getFormat().name());
+                    updateStmt.setInt(5, offer.getCategory().getId());
 
-                updateStmt.setString(1, offer.getTitle());
-                updateStmt.setString(2, offer.getDescription());
-                updateStmt.setBigDecimal(3, offer.getPrice());
-                updateStmt.setString(4, offer.getFormat().name());
-                updateStmt.setInt(5, offer.getCategory().getId());
-
-                if (offer.getAttachment() != null && offer.getAttachment().getId() != null) {
-                    updateStmt.setLong(6, offer.getAttachment().getId());
-                } else {
-                    updateStmt.setNull(6, Types.BIGINT);
-                }
-                updateStmt.setLong(7, offer.getId());
-                updateStmt.executeUpdate();
-
-                deleteSubjectsStmt.setLong(1, offer.getId());
-                deleteSubjectsStmt.executeUpdate();
-
-                if (offer.getSubjects() != null && !offer.getSubjects().isEmpty()) {
-                    for (Subject subject : offer.getSubjects()) {
-                        insertSubjectsStmt.setLong(1, offer.getId());
-                        insertSubjectsStmt.setInt(2, subject.getId());
-                        insertSubjectsStmt.addBatch();
+                    if (offer.getAttachment() != null && offer.getAttachment().getId() != null) {
+                        updateStmt.setLong(6, offer.getAttachment().getId());
+                    } else {
+                        updateStmt.setNull(6, Types.BIGINT);
                     }
-                    insertSubjectsStmt.executeBatch();
+                    updateStmt.setLong(7, offer.getId());
+                    updateStmt.executeUpdate();
+                }
+
+                Set<Integer> existingSubjectIds = new HashSet<>();
+                try (PreparedStatement selectStmt = connection.prepareStatement(SQL_SELECT_SUBJECT_IDS)) {
+                    selectStmt.setLong(1, offer.getId());
+                    try (ResultSet rs = selectStmt.executeQuery()) {
+                        while (rs.next()) {
+                            existingSubjectIds.add(rs.getInt("subject_id"));
+                        }
+                    }
+                }
+
+                Set<Integer> newSubjectIds = new HashSet<>();
+                if (offer.getSubjects() != null) {
+                    for (Subject subject : offer.getSubjects()) {
+                        newSubjectIds.add(subject.getId());
+                    }
+                }
+
+                try (PreparedStatement deleteStmt = connection.prepareStatement(SQL_DELETE_OFFER_SUBJECT)) {
+                    for (Integer oldId : existingSubjectIds) {
+                        if (!newSubjectIds.contains(oldId)) {
+                            deleteStmt.setLong(1, offer.getId());
+                            deleteStmt.setInt(2, oldId);
+                            deleteStmt.addBatch();
+                        }
+                    }
+                    deleteStmt.executeBatch();
+                }
+
+                try (PreparedStatement insertStmt = connection.prepareStatement(SQL_INSERT_OFFER_SUBJECT)) {
+                    for (Integer newId : newSubjectIds) {
+                        if (!existingSubjectIds.contains(newId)) {
+                            insertStmt.setLong(1, offer.getId());
+                            insertStmt.setInt(2, newId);
+                            insertStmt.addBatch();
+                        }
+                    }
+                    insertStmt.executeBatch();
                 }
 
                 connection.commit();

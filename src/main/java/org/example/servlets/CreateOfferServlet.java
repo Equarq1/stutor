@@ -56,6 +56,14 @@ public class CreateOfferServlet extends HttpServlet {
                 ? Arrays.stream(subjectIdsRaw).map(Integer::parseInt).toList()
                 : List.of();
 
+        if (subjectIds.isEmpty()) {
+            req.setAttribute("errorMessage", "Выберите хотя бы одну дисциплину");
+            req.setAttribute("offerFormats", OfferFormat.values());
+            req.setAttribute("categories", categoryService.getAllCategories());
+            req.setAttribute("faculties", facultyService.getAllFaculties());
+            req.getRequestDispatcher("/jsp/create-offer-form.jsp").forward(req, resp);
+            return;
+        }
 
         Part filePart = req.getPart("file");
         Long attachmentId = null;

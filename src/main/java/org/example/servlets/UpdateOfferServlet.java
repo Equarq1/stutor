@@ -20,6 +20,7 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @WebServlet("/offer/update")
 @MultipartConfig
@@ -76,6 +77,15 @@ public class UpdateOfferServlet extends HttpServlet {
         List<Integer> subjectIds = (subjectIdsRaw != null)
                 ? Arrays.stream(subjectIdsRaw).map(Integer::parseInt).toList()
                 : List.of();
+
+        if (subjectIds.isEmpty()) {
+            req.setAttribute("errorMessage", "Выберите хотя бы одну дисциплину");
+            req.setAttribute("offerFormats", OfferFormat.values());
+            req.setAttribute("categories", categoryService.getAllCategories());
+            req.setAttribute("faculties", facultyService.getAllFaculties());
+            req.getRequestDispatcher("/jsp/update-offer-page.jsp").forward(req, resp);
+            return;
+        }
 
         Long attachmentId = null;
         String oldAttachmentIdParam = req.getParameter("oldAttachmentId");
