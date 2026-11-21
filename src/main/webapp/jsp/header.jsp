@@ -13,6 +13,7 @@
                 <a href="${pageContext.request.contextPath}/offers">Лента объявлений</a>
                 <a href="${pageContext.request.contextPath}/my-offers">Мои объявления</a>
                 <a href="${pageContext.request.contextPath}/create-offer">Создать объявление</a>
+                <a href="${pageContext.request.contextPath}/requests">Заявки</a>
             </nav>
 
             <div class="auth-menu">
