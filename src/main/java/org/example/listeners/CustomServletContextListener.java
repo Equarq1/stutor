@@ -8,22 +8,27 @@ import org.example.repository.*;
 import org.example.service.*;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.Properties;
+
 @WebListener
 public class CustomServletContextListener implements ServletContextListener {
-    private static final String DB_USERNAME = "postgres";
-    private static final String DB_PASSWORD = "pract12345678";
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/stutor_db";
-    private static final String DB_DRIVER = "org.postgresql.Driver";
+    private static final String DB_PROPERTIES_FILE = "db.properties";
 
 
     @Override
     public void contextInitialized(ServletContextEvent sce) {
         ServletContext servletContext = sce.getServletContext();
+        Properties dbProperties = loadDbProperties();
+
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(DB_DRIVER);
-        dataSource.setUsername(DB_USERNAME);
-        dataSource.setPassword(DB_PASSWORD);
-        dataSource.setUrl(DB_URL);
+        dataSource.setDriverClassName(dbProperties.getProperty("db.driver"));
+        dataSource.setUrl(dbProperties.getProperty("db.url"));
+        dataSource.setUsername(dbProperties.getProperty("db.username"));
+        dataSource.setPassword(dbProperties.getProperty("db.password"));
 
         // Репозитории
         UserRepositoryJdbcImpl userRepository = new UserRepositoryJdbcImpl(dataSource);
@@ -75,5 +80,19 @@ public class CustomServletContextListener implements ServletContextListener {
         servletContext.setAttribute("requestService", requestService);
         servletContext.setAttribute("reviewService", reviewService);
 
+    }
+
+    private Properties loadDbProperties() {
+        try (InputStream in = getClass().getClassLoader().getResourceAsStream(DB_PROPERTIES_FILE)) {
+            if (in == null) {
+                throw new IllegalStateException(
+                        DB_PROPERTIES_FILE + " not found. Copy db.properties.example to db.properties and fill it in.");
+            }
+            Properties properties = new Properties();
+            properties.load(new InputStreamReader(in, StandardCharsets.UTF_8));
+            return properties;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read " + DB_PROPERTIES_FILE, e);
+        }
     }
 }
