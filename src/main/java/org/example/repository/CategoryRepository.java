@@ -6,4 +6,7 @@ import java.util.List;
 
 public interface CategoryRepository extends CrudRepository<Category> {
     List<Category> findAll();
+    void deleteById(int id);
+    boolean existsByName(String name);
+    boolean isUsedInOffers(int id);
 }

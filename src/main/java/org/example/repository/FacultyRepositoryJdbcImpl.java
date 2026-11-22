@@ -16,13 +16,16 @@ public class FacultyRepositoryJdbcImpl implements FacultyRepository{
     }
 
 
+    @Override
+    public void save(Faculty faculty) throws SQLException {
+
+    }
 
     @Override
     public List<Faculty> findAll() {
         try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(SQL_SELECT_ALL);
-        ) {
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_ALL);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
             List<Faculty> list = new ArrayList<>();
 
             while (resultSet.next()) {
@@ -33,10 +36,7 @@ public class FacultyRepositoryJdbcImpl implements FacultyRepository{
                 list.add(faculty);
             }
             return list;
-
-
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }

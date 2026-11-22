@@ -18,25 +18,30 @@ public class SubjectRepositoryJdbcImpl implements SubjectRepository {
             JOIN faculties AS f ON f.id = s.faculty_id
             """;
 
+    private static final String SQL_SELECT_ALL_ORDERED = SQL_SELECT_ALL + " ORDER BY f.name, s.course, s.name";
     private static final String SQL_SELECT_BY_FACULTY_ID_AND_COURSE = SQL_SELECT_ALL + " WHERE f.id = ? AND course = ?";
+    private static final String SQL_INSERT = "INSERT INTO subjects (name, course, faculty_id) VALUES (?, ?, ?)";
+    private static final String SQL_DELETE = "DELETE FROM subjects WHERE id = ?";
+    private static final String SQL_EXISTS = "SELECT 1 FROM subjects WHERE faculty_id = ? AND course = ? AND LOWER(name) = LOWER(?)";
+    private static final String SQL_IS_USED = "SELECT 1 FROM offer_subjects WHERE subject_id = ? LIMIT 1";
+
+
 
     public SubjectRepositoryJdbcImpl(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
-
     @Override
     public List<Subject> findAll() {
         try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(SQL_SELECT_ALL);) {
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_ALL_ORDERED);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
             List<Subject> list = new ArrayList<>();
             while (resultSet.next()) {
                 list.add(rowMapperToSubject(resultSet));
             }
             return list;
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
@@ -54,17 +59,48 @@ public class SubjectRepositoryJdbcImpl implements SubjectRepository {
                 }
                 return list;
             }
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
 
-
-
     @Override
     public void save(Subject subject) throws SQLException {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_INSERT)) {
+            ps.setString(1, subject.getName());
+            ps.setInt(2, subject.getCourse());
+            ps.setInt(3, subject.getFaculty().getId());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
+    @Override
+    public void deleteById(int id) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_DELETE)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public boolean exists(Integer facultyId, Integer course, String name) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_EXISTS)) {
+            ps.setInt(1, facultyId);
+            ps.setInt(2, course);
+            ps.setString(3, name);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private Subject rowMapperToSubject(ResultSet resultSet) {
@@ -80,8 +116,20 @@ public class SubjectRepositoryJdbcImpl implements SubjectRepository {
                     .course(resultSet.getInt("course"))
                     .faculty(faculty)
                     .build();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        catch (SQLException e) {
+    }
+
+    @Override
+    public boolean isUsedInOffers(int id) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_IS_USED)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
     }
