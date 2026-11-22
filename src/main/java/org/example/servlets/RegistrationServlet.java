@@ -39,12 +39,25 @@ public class RegistrationServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Integer cityId;
+        Integer groupId;
+        try {
+            cityId = Integer.valueOf(req.getParameter("cityId"));
+            groupId = Integer.valueOf(req.getParameter("groupId"));
+        } catch (NumberFormatException e) {
+            req.setAttribute("errorMessage", "Выберите город и группу");
+            req.setAttribute("faculties", facultyService.getAllFaculties());
+            req.setAttribute("cities", cityService.getAllCities());
+            req.getRequestDispatcher("/jsp/registration-form.jsp").forward(req, resp);
+            return;
+        }
+
         RegistrationDto registrationDto = RegistrationDto.builder()
                 .email(req.getParameter("email"))
                 .password(req.getParameter("password"))
                 .fullName(req.getParameter("fullName"))
-                .cityId(Integer.valueOf(req.getParameter("cityId")))
-                .groupId(Integer.valueOf(req.getParameter("groupId")))
+                .cityId(cityId)
+                .groupId(groupId)
                 .build();
         try {
             authService.register(registrationDto);

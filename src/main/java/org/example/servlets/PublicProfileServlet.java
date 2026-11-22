@@ -13,7 +13,7 @@ import org.example.service.UserService;
 import java.io.IOException;
 import java.util.Objects;
 
-@WebServlet("/user") // Не придумал надо поменять
+@WebServlet("/user")
 public class PublicProfileServlet extends HttpServlet {
 
     private UserService userService;
@@ -36,7 +36,14 @@ public class PublicProfileServlet extends HttpServlet {
             return;
         }
 
-        User targetUser = userService.getUserById(Long.parseLong(idParam));
+        Long userId;
+        try {
+            userId = Long.parseLong(idParam);
+        } catch (NumberFormatException e) {
+            resp.sendRedirect(req.getContextPath() + "/home");
+            return;
+        }
+        User targetUser = userService.getUserById(userId);
         User currentUser = (User) req.getSession().getAttribute("user");
         if (targetUser == null) {
             resp.sendError(HttpServletResponse.SC_NOT_FOUND, "Пользователь не найден");

@@ -50,7 +50,7 @@ public class RequestRepositoryJdbcImpl implements RequestRepository {
              PreparedStatement preparedStatement = connection.prepareStatement(SQL_INSERT_INTO_REQUESTS)
         ) {
             preparedStatement.setLong(1, request.getOffer().getId());
-            preparedStatement.setLong(2, request.getSubject().getId());
+            preparedStatement.setInt(2, request.getSubject().getId());
             preparedStatement.setString(3, request.getMessage());
             preparedStatement.setObject(4, LocalDateTime.now());
             preparedStatement.setString(5, RequestStatus.PENDING.name());

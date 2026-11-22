@@ -27,9 +27,15 @@ public class GroupApiServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        int facultyId = Integer.parseInt(req.getParameter("facultyId"));
-        int course = Integer.parseInt(req.getParameter("course"));
-
+        int facultyId;
+        int course;
+        try {
+            facultyId = Integer.parseInt(req.getParameter("facultyId"));
+            course = Integer.parseInt(req.getParameter("course"));
+        } catch (NumberFormatException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Некорректные параметры");
+            return;
+        }
         LocalDate now = LocalDate.now();
         int academicStartYear = (now.getMonthValue() < 9) ? now.getYear() - 1 : now.getYear();
         int admissionYear = academicStartYear - course + 1;

@@ -27,8 +27,16 @@ public class AuthServiceImpl implements AuthService {
     public void register(RegistrationDto registrationDto) throws SQLException {
         String email = registrationDto.getEmail();
 
+
         if (!email.matches(KFU_EMAIL_REGEX)) {
             throw new IllegalArgumentException("Можно зарегистрироваться только с почтой КФУ");
+        }
+
+        if (registrationDto.getPassword() == null || registrationDto.getPassword().isBlank()) {
+            throw new IllegalArgumentException("Введите пароль");
+        }
+        if (registrationDto.getFullName() == null || registrationDto.getFullName().isBlank()) {
+            throw new IllegalArgumentException("Введите ФИО");
         }
 
         if ((userRepository.findByEmail(email).isPresent())) {
@@ -55,6 +63,11 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public User authenticate(LoginDto loginDto) throws SQLException {
         User user = userRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new IllegalArgumentException("Неверный логин или пароль"));
+
+        if (loginDto.getEmail() == null || loginDto.getPassword() == null) {
+            throw new IllegalArgumentException("Неверный логин или пароль");
+        }
+
 
         if (!passwordEncoder.matches(loginDto.getPassword(), user.getHashPassword())) {
             throw new IllegalArgumentException("Неверный логин или пароль");

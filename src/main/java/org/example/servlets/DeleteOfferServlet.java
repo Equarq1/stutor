@@ -26,7 +26,13 @@ public class DeleteOfferServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        long id = Long.parseLong(req.getParameter("id"));
+        long id;
+        try {
+            id = Long.parseLong(req.getParameter("id"));
+        } catch (NumberFormatException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Некорректный ID");
+            return;
+        }
         Offer offer = offerService.getOfferById(id);
         User currentUser = (User) req.getSession().getAttribute("user");
 

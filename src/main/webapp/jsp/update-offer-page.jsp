@@ -16,10 +16,6 @@
             <form action="${pageContext.request.contextPath}/offer/update" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="id" value="${offer.id}">
 
-                <c:if test="${not empty offer.attachment}">
-                    <input type="hidden" name="oldAttachmentId" value="${offer.attachment.id}">
-                </c:if>
-
                 <label>Название:</label>
                 <input type="text" name="title" value="${offer.title}" required>
 

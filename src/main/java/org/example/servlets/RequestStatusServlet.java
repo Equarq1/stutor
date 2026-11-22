@@ -25,8 +25,15 @@ public class RequestStatusServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Long requestId = Long.parseLong(req.getParameter("requestId"));
-        RequestStatus status = RequestStatus.valueOf(req.getParameter("status"));
+        Long requestId;
+        RequestStatus status;
+        try {
+            requestId = Long.parseLong(req.getParameter("requestId"));
+            status = RequestStatus.valueOf(req.getParameter("status"));
+        } catch (IllegalArgumentException | NullPointerException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Некорректные параметры");
+            return;
+        }
         User currentUser = (User) req.getSession().getAttribute("user");
 
         Request request = requestService.getRequestById(requestId).orElse(null);
@@ -34,6 +41,12 @@ public class RequestStatusServlet extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_FORBIDDEN, "Нет прав на изменение статуса заявки");
             return;
         }
+
+        if (request.getStatus() != RequestStatus.PENDING) {
+            resp.sendError(HttpServletResponse.SC_CONFLICT, "Статус заявки уже изменён");
+            return;
+        }
+
         requestService.changeStatus(requestId, status);
         resp.sendRedirect(req.getContextPath() + "/requests?type=incoming");
     }

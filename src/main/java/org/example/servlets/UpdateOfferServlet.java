@@ -20,7 +20,6 @@ import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 @WebServlet("/offer/update")
 @MultipartConfig
@@ -46,7 +45,14 @@ public class UpdateOfferServlet extends HttpServlet {
             return;
         }
 
-        Offer offer = offerService.getOfferById(Long.parseLong(idParam));
+        Long offerId;
+        try {
+            offerId = Long.parseLong(idParam);
+        } catch (NumberFormatException e) {
+            resp.sendRedirect(req.getContextPath() + "/my-offers");
+            return;
+        }
+        Offer offer = offerService.getOfferById(offerId);
         User currentUser = (User) req.getSession().getAttribute("user");
 
         if (offer == null || !offer.getAuthor().getId().equals(currentUser.getId())) {
@@ -65,7 +71,14 @@ public class UpdateOfferServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         User currentUser = (User) req.getSession().getAttribute("user");
-        Long offerId = Long.parseLong(req.getParameter("id"));
+
+        Long offerId;
+        try {
+            offerId = Long.parseLong(req.getParameter("id"));
+        } catch (NumberFormatException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Некорректный ID объявления");
+            return;
+        }
 
         Offer existingOffer = offerService.getOfferById(offerId);
         if (existingOffer == null || !existingOffer.getAuthor().getId().equals(currentUser.getId())) {
@@ -73,13 +86,26 @@ public class UpdateOfferServlet extends HttpServlet {
             return;
         }
 
-        String[] subjectIdsRaw = req.getParameterValues("subjectIds");
-        List<Integer> subjectIds = (subjectIdsRaw != null)
-                ? Arrays.stream(subjectIdsRaw).map(Integer::parseInt).toList()
-                : List.of();
+        List<Integer> subjectIds;
+        BigDecimal price;
+        OfferFormat format;
+        Integer categoryId;
+        try {
+            String[] subjectIdsRaw = req.getParameterValues("subjectIds");
+            subjectIds = (subjectIdsRaw != null)
+                    ? Arrays.stream(subjectIdsRaw).map(Integer::parseInt).toList()
+                    : List.of();
+            price = new BigDecimal(req.getParameter("price").replace(",", "."));
+            format = OfferFormat.valueOf(req.getParameter("format"));
+            categoryId = Integer.valueOf(req.getParameter("categoryId"));
+        } catch (IllegalArgumentException | NullPointerException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Некорректные параметры");
+            return;
+        }
 
         if (subjectIds.isEmpty()) {
             req.setAttribute("errorMessage", "Выберите хотя бы одну дисциплину");
+            req.setAttribute("offer", existingOffer);
             req.setAttribute("offerFormats", OfferFormat.values());
             req.setAttribute("categories", categoryService.getAllCategories());
             req.setAttribute("faculties", facultyService.getAllFaculties());
@@ -87,11 +113,9 @@ public class UpdateOfferServlet extends HttpServlet {
             return;
         }
 
-        Long attachmentId = null;
-        String oldAttachmentIdParam = req.getParameter("oldAttachmentId");
-        if (oldAttachmentIdParam != null && !oldAttachmentIdParam.isEmpty()) {
-            attachmentId = Long.parseLong(oldAttachmentIdParam);
-        }
+        Long attachmentId = (existingOffer.getAttachment() != null)
+                ? existingOffer.getAttachment().getId()
+                : null;
 
         Part filePart = req.getPart("file");
         if (filePart != null && filePart.getSize() > 0 && !filePart.getSubmittedFileName().isEmpty()) {
@@ -110,9 +134,9 @@ public class UpdateOfferServlet extends HttpServlet {
         CreateOfferDto dto = CreateOfferDto.builder()
                 .title(req.getParameter("title"))
                 .description(req.getParameter("description"))
-                .price(new BigDecimal(req.getParameter("price").replace(",", ".")))
-                .format(OfferFormat.valueOf(req.getParameter("format")))
-                .categoryId(Integer.valueOf(req.getParameter("categoryId")))
+                .price(price)
+                .format(format)
+                .categoryId(categoryId)
                 .subjectIds(subjectIds)
                 .attachmentId(attachmentId)
                 .build();

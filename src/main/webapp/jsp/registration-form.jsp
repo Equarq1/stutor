@@ -19,14 +19,14 @@
             <input type="text" name="fullName" placeholder="Введите ФИО" required>
 
             <select id="faculty-select" required>
-                <option value="" disabled selected></option>
+                <option value="" disabled selected>Выберите факультет...</option>
                 <c:forEach items="${faculties}" var="faculty">
                     <option value="${faculty.id}">${faculty.name}</option>
                 </c:forEach>
             </select>
 
             <select id="course-select" required>
-                <option value="" disabled selected></option>
+                <option value="" disabled selected>Выберите курс...</option>
                 <c:forEach begin="1" end="4" var="i">
                     <option value="${i}">${i}</option>
                 </c:forEach>
@@ -37,7 +37,7 @@
             </select>
 
             <select name="cityId" required>
-                <option value="" disabled selected></option>
+                <option value="" disabled selected>Выберите город...</option>
                 <c:forEach items="${cities}" var="city">
                     <option value="${city.id}">${city.name}</option>
                 </c:forEach>

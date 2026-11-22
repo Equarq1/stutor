@@ -26,8 +26,15 @@ public class OfferStatusServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Long id = Long.parseLong(req.getParameter("id"));
-        OfferStatus status = OfferStatus.valueOf(req.getParameter("newStatus"));
+        Long id;
+        OfferStatus status;
+        try {
+            id = Long.parseLong(req.getParameter("id"));
+            status = OfferStatus.valueOf(req.getParameter("newStatus"));
+        } catch (IllegalArgumentException | NullPointerException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Некорректные параметры");
+            return;
+        }
 
         User currentUser = (User) req.getSession().getAttribute("user");
         Offer offer = offerService.getOfferById(id);

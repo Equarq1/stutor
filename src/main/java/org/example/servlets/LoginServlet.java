@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.example.dto.LoginDto;
 import org.example.models.User;
+import org.example.models.enums.UserStatus;
 import org.example.service.AuthService;
 
 import java.io.IOException;
@@ -25,6 +26,9 @@ public class LoginServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        if ("true".equals(req.getParameter("blocked"))) {
+            req.setAttribute("errorMessage", "Ваш аккаунт заблокирован");
+        }
         req.getRequestDispatcher("/jsp/login-form.jsp").forward(req, resp);
     }
 
@@ -37,6 +41,13 @@ public class LoginServlet extends HttpServlet {
                             .password(req.getParameter("password"))
                             .build()
             );
+
+
+
+            if (user.getUserStatus().equals(UserStatus.BLOCKED)) {
+                throw new IllegalArgumentException("Ваш аккаунт заблокирован");
+            }
+
             HttpSession session = req.getSession();
             session.setAttribute("user", user);
             resp.sendRedirect(req.getContextPath() + "/home");

@@ -14,9 +14,9 @@
         </c:if>
 
         <form class="create-offer-form" action="${pageContext.request.contextPath}/create-offer" method="post" enctype="multipart/form-data">
-            <input type="text" name="title" placeholder="Введите заголовок объявления" required>
+            <input type="text" name="title" placeholder="Введите заголовок объявления" maxlength="150" required>
             <div class="offer-description">
-                <input type="text" name="description" placeholder="Описание тьюторства">
+                <input type="text" name="description" placeholder="Описание тьюторства" required>
             </div>
 
             <select name="format" required>
@@ -25,7 +25,7 @@
                 </c:forEach>
             </select>
 
-            <input type="text" class="price" name="price" placeholder="Введите цену" required>
+            <input type="number" step="0.01" min="0" max="999999.99" class="price" name="price" placeholder="Введите цену" required>
             <select name="categoryId" required>
                 <c:forEach var="category" items="${categories}">
                     <option value="${category.id}">${category.name}</option>

@@ -1,10 +1,8 @@
 function loadGroups() {
     let facultyId = $('#faculty-select').val();
     let course = $('#course-select').val();
-    console.log(facultyId);
-    console.log(course);
+
     if (facultyId && course) {
-        console.log("ajax started")
         $.ajax({
             type: "GET",
             url: contextPath + "/api/groups",

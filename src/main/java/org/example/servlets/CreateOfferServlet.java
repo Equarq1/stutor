@@ -26,7 +26,6 @@ public class CreateOfferServlet extends HttpServlet {
 
     private OfferService offerService;
     private CategoryService categoryService;
-    private SubjectService subjectService;
     private FacultyService facultyService;
     private FileInfoService fileInfoService;
 
@@ -34,7 +33,6 @@ public class CreateOfferServlet extends HttpServlet {
     public void init(ServletConfig config) throws ServletException {
         offerService = (OfferService) config.getServletContext().getAttribute("offerService");
         categoryService = (CategoryService) config.getServletContext().getAttribute("categoryService");
-        subjectService = (SubjectService) config.getServletContext().getAttribute("subjectService");
         facultyService = (FacultyService) config.getServletContext().getAttribute("facultyService");
         fileInfoService = (FileInfoService) config.getServletContext().getAttribute("fileInfoService");
     }
@@ -49,12 +47,24 @@ public class CreateOfferServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
         User currentUser = (User) req.getSession().getAttribute("user");
-        String[] subjectIdsRaw = req.getParameterValues("subjectIds");
-        List<Integer> subjectIds = (subjectIdsRaw != null)
-                ? Arrays.stream(subjectIdsRaw).map(Integer::parseInt).toList()
-                : List.of();
+
+        List<Integer> subjectIds;
+        BigDecimal price;
+        OfferFormat format;
+        Integer categoryId;
+        try {
+            String[] subjectIdsRaw = req.getParameterValues("subjectIds");
+            subjectIds = (subjectIdsRaw != null)
+                    ? Arrays.stream(subjectIdsRaw).map(Integer::parseInt).toList()
+                    : List.of();
+            price = new BigDecimal(req.getParameter("price").replace(",", "."));
+            format = OfferFormat.valueOf(req.getParameter("format"));
+            categoryId = Integer.valueOf(req.getParameter("categoryId"));
+        } catch (IllegalArgumentException | NullPointerException e) {
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST, "Некорректные параметры");
+            return;
+        }
 
         if (subjectIds.isEmpty()) {
             req.setAttribute("errorMessage", "Выберите хотя бы одну дисциплину");
@@ -81,14 +91,13 @@ public class CreateOfferServlet extends HttpServlet {
             }
         }
 
-
         CreateOfferDto createOfferDto = CreateOfferDto.builder()
                 .title(req.getParameter("title"))
                 .description(req.getParameter("description"))
-                .price(new BigDecimal(req.getParameter("price").replace(",", ".")))
-                .format(OfferFormat.valueOf(req.getParameter("format")))
+                .price(price)
+                .format(format)
                 .authorId(currentUser.getId())
-                .categoryId(Integer.valueOf(req.getParameter("categoryId")))
+                .categoryId(categoryId)
                 .subjectIds(subjectIds)
                 .attachmentId(attachmentId)
                 .build();
