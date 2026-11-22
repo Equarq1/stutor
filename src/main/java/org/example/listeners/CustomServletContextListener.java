@@ -50,7 +50,7 @@ public class CustomServletContextListener implements ServletContextListener {
         OfferService offerService = new OfferServiceImpl(offerRepository);
         CategoryService categoryService = new CategoryServiceImpl(categoryRepository);
         SubjectService subjectService = new SubjectServiceImpl(subjectRepository);
-        FileInfoService fileInfoService = new FileInfoServiceImpl(fileInfoRepository);
+        FileInfoService fileInfoService = new FileInfoServiceImpl(fileInfoRepository, dbProperties.getProperty("file.storage.path"));
         UserService userService = new UserServiceImpl(userRepository);
         RequestService requestService = new RequestServiceImpl(requestRepository);
         ReviewService reviewService = new ReviewServiceImpl(reviewRepository, requestRepository);

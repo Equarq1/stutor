@@ -1,0 +1,5 @@
+db.url=jdbc:postgresql://localhost:5432/stutor_db
+db.username=postgres
+db.password=пароль
+db.driver=org.postgresql.Driver
+file.storage.path=D:/JavaProjects/files/

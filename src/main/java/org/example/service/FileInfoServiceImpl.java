@@ -17,10 +17,11 @@ import java.util.UUID;
 
 public class FileInfoServiceImpl implements FileInfoService {
     private final FileInfoRepository fileInfoRepository;
-    private final String PATH_TO_STORAGE_DIRECTORY = "D:/JavaProjects/files/";
+    private final String PATH_TO_STORAGE_DIRECTORY;
 
-    public FileInfoServiceImpl(FileInfoRepository fileInfoRepository) {
+    public FileInfoServiceImpl(FileInfoRepository fileInfoRepository, String storagePath) {
         this.fileInfoRepository = fileInfoRepository;
+        this.PATH_TO_STORAGE_DIRECTORY = storagePath;
         try {
             Files.createDirectories(Paths.get(PATH_TO_STORAGE_DIRECTORY));
         } catch (IOException e) {
