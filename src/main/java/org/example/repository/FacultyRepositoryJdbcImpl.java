@@ -15,12 +15,6 @@ public class FacultyRepositoryJdbcImpl implements FacultyRepository{
         this.dataSource = dataSource;
     }
 
-
-    @Override
-    public void save(Faculty faculty) throws SQLException {
-
-    }
-
     @Override
     public List<Faculty> findAll() {
         try (Connection connection = dataSource.getConnection();

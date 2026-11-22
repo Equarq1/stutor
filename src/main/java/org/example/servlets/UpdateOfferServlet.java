@@ -22,7 +22,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @WebServlet("/offer/update")
-@MultipartConfig
+@MultipartConfig(maxFileSize = 10485760)
 public class UpdateOfferServlet extends HttpServlet {
     private OfferService offerService;
     private CategoryService categoryService;

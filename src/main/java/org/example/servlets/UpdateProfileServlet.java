@@ -15,7 +15,7 @@ import org.example.service.UserService;
 import java.io.IOException;
 
 @WebServlet("/profile/update")
-@MultipartConfig
+@MultipartConfig(maxFileSize = 10485760)
 public class UpdateProfileServlet extends HttpServlet {
     private UserService userService;
     private FileInfoService fileInfoService;

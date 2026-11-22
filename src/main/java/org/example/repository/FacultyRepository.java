@@ -4,6 +4,6 @@ import org.example.models.Faculty;
 
 import java.util.List;
 
-public interface FacultyRepository extends CrudRepository<Faculty> {
+public interface FacultyRepository {
     List<Faculty> findAll();
 }

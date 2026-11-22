@@ -23,7 +23,7 @@ import java.sql.SQLException;
 import java.util.Objects;
 
 @WebServlet("/request/create")
-@MultipartConfig
+@MultipartConfig(maxFileSize = 10485760)
 public class CreateRequestServlet extends HttpServlet {
 
     private OfferService offerService;

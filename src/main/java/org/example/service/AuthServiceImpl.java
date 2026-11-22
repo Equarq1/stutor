@@ -62,12 +62,12 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     public User authenticate(LoginDto loginDto) throws SQLException {
-        User user = userRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new IllegalArgumentException("Неверный логин или пароль"));
 
         if (loginDto.getEmail() == null || loginDto.getPassword() == null) {
             throw new IllegalArgumentException("Неверный логин или пароль");
         }
 
+        User user = userRepository.findByEmail(loginDto.getEmail()).orElseThrow(() -> new IllegalArgumentException("Неверный логин или пароль"));
 
         if (!passwordEncoder.matches(loginDto.getPassword(), user.getHashPassword())) {
             throw new IllegalArgumentException("Неверный логин или пароль");

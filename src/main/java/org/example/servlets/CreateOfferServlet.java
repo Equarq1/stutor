@@ -21,7 +21,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @WebServlet("/create-offer")
-@MultipartConfig
+@MultipartConfig(maxFileSize = 10485760)
 public class CreateOfferServlet extends HttpServlet {
 
     private OfferService offerService;
