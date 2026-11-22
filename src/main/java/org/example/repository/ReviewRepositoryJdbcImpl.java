@@ -30,11 +30,23 @@ public class ReviewRepositoryJdbcImpl implements ReviewRepository {
             ORDER BY rev.created_at DESC
             """;
 
+    private static final String SQL_SELECT_ALL = """
+            SELECT rev.id, rev.request_id, rev.rating, rev.comment, rev.created_at,
+                   s.id AS student_id, s.full_name AS student_name,
+                   t.id AS tutor_id, t.full_name AS tutor_name
+            FROM reviews rev
+            JOIN users s ON rev.student_id = s.id
+            JOIN users t ON rev.tutor_id = t.id
+            ORDER BY rev.created_at DESC
+            """;
+
+    private static final String SQL_DELETE = "DELETE FROM reviews WHERE id = ?";
+
     private static final String SQL_EXISTS_BY_REQUEST_ID =
             "SELECT 1 FROM reviews WHERE request_id = ?";
 
     private static final String SQL_AVG_RATING_BY_TUTOR_ID =
-            "SELECT AVG(rating) FROM reviews WHERE tutor_id = ?";
+            "SELECT ROUND(AVG(rating), 1) FROM reviews WHERE tutor_id = ?";
 
     public ReviewRepositoryJdbcImpl(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -73,6 +85,50 @@ public class ReviewRepositoryJdbcImpl implements ReviewRepository {
             throw new RuntimeException("Ошибка при получении отзывов", e);
         }
         return reviews;
+    }
+
+    @Override
+    public List<Review> findAll() {
+        List<Review> reviews = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_SELECT_ALL);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                User student = User.builder()
+                        .id(rs.getLong("student_id"))
+                        .fullName(rs.getString("student_name"))
+                        .build();
+                User tutor = User.builder()
+                        .id(rs.getLong("tutor_id"))
+                        .fullName(rs.getString("tutor_name"))
+                        .build();
+                Long requestId = rs.getObject("request_id") != null ? rs.getLong("request_id") : null;
+
+                reviews.add(Review.builder()
+                        .id(rs.getLong("id"))
+                        .requestId(requestId)
+                        .student(student)
+                        .tutor(tutor)
+                        .rating(rs.getShort("rating"))
+                        .comment(rs.getString("comment"))
+                        .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                        .build());
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при получении всех отзывов", e);
+        }
+        return reviews;
+    }
+
+    @Override
+    public void deleteById(Long id) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_DELETE)) {
+            ps.setLong(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException("Ошибка при удалении отзыва", e);
+        }
     }
 
     @Override

@@ -14,5 +14,6 @@ public interface OfferRepository extends CrudRepository<Offer> {
     List<Offer> findByUserId(long id);
     void changeStatus(Long id, OfferStatus status);
     void update(Offer offer);
+    List<Offer> findAllForAdmin();
 
 }

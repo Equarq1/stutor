@@ -17,4 +17,5 @@ public interface OfferService {
     List<Offer> getOffersByUserId(Long id);
     void changeStatus(Long id, OfferStatus status);
     void update(Long offerId, CreateOfferDto dto) throws SQLException;
+    List<Offer> getAllOffersForAdmin();
 }

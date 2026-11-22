@@ -114,4 +114,9 @@ public class OfferServiceImpl implements OfferService {
 
         offerRepository.update(offer);
     }
+
+    @Override
+    public List<Offer> getAllOffersForAdmin() {
+        return offerRepository.findAllForAdmin();
+    }
 }

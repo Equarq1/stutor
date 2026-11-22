@@ -71,4 +71,14 @@ public class ReviewServiceImpl implements ReviewService {
     public boolean existsByRequestId(Long requestId) {
         return reviewRepository.existsByRequestId(requestId);
     }
+
+    @Override
+    public List<Review> getAllReviews() {
+        return reviewRepository.findAll();
+    }
+
+    @Override
+    public void deleteReview(Long id) {
+        reviewRepository.deleteById(id);
+    }
 }

@@ -62,6 +62,8 @@ public class OfferRepositoryJdbcImpl implements OfferRepository {
     private static final String SQL_DELETE_OFFER_SUBJECT =
             "DELETE FROM offer_subjects WHERE offer_id = ? AND subject_id = ?";
 
+    private static final String SQL_SELECT_ALL_FOR_ADMIN = SQL_BASE + " ORDER BY o.created_at DESC";
+
     public OfferRepositoryJdbcImpl(DataSource dataSource) {
         this.dataSource = dataSource;
     }
@@ -69,8 +71,8 @@ public class OfferRepositoryJdbcImpl implements OfferRepository {
     @Override
     public List<Offer> findAll() {
         try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet resultSet = statement.executeQuery(SQL_SELECT_ALL)) {
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_ALL);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
 
             List<Offer> list = new ArrayList<>();
             while (resultSet.next()) {
@@ -367,7 +369,22 @@ public class OfferRepositoryJdbcImpl implements OfferRepository {
             throw new RuntimeException(e);
         }
         return subjects;
+    }
 
-
+    @Override
+    public List<Offer> findAllForAdmin() {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement ps = connection.prepareStatement(SQL_SELECT_ALL_FOR_ADMIN);
+             ResultSet rs = ps.executeQuery()) {
+            List<Offer> list = new ArrayList<>();
+            while (rs.next()) {
+                Offer offer = mapRowToOffer(rs);
+                offer.setSubjects(getSubjectsForOffer(offer.getId(), connection));
+                list.add(offer);
+            }
+            return list;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

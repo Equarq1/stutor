@@ -8,4 +8,6 @@ public interface ReviewRepository extends CrudRepository<Review> {
     List<Review> findByTutorId(Long tutorId);
     boolean existsByRequestId(Long requestId);
     Double getAverageRatingByTutorId(Long tutorId);
+    List<Review> findAll();
+    void deleteById(Long id);
 }

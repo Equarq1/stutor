@@ -11,4 +11,6 @@ public interface ReviewService {
     List<Review> getReviewsByTutorId(Long tutorId);
     Double getAverageRatingByTutorId(Long tutorId);
     boolean existsByRequestId(Long requestId);
+    List<Review> getAllReviews();
+    void deleteReview(Long id);
 }
