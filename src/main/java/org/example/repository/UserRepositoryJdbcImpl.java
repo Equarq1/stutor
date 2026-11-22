@@ -7,6 +7,7 @@ import org.example.models.enums.UserStatus;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,11 +38,34 @@ public class UserRepositoryJdbcImpl implements UserRepository{
             "contact, created_at, role, status, city_id, group_id) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     private static final String SQL_UPDATE_PROFILE = "UPDATE users SET about = ?, contact = ?, avatar_id = ? WHERE id = ?";
-
+    private static final String SQL_SELECT_ALL = SQL_SELECT_BY_SOMETHING + " ORDER BY u.id";
+    private static final String SQL_UPDATE_STATUS = "UPDATE users SET status = ? WHERE id = ?";
 
     @Override
-    public List findAll() {
-        return List.of();
+    public List<User> findAll() {
+        List<User> users = new ArrayList<>();
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_SELECT_ALL);
+             ResultSet resultSet = preparedStatement.executeQuery()) {
+            while (resultSet.next()) {
+                users.add(rowMapperToUser(resultSet));
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return users;
+    }
+
+    @Override
+    public void updateStatus(Long userId, UserStatus status) {
+        try (Connection connection = dataSource.getConnection();
+             PreparedStatement preparedStatement = connection.prepareStatement(SQL_UPDATE_STATUS)) {
+            preparedStatement.setString(1, status.name());
+            preparedStatement.setLong(2, userId);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

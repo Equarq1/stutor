@@ -1,7 +1,10 @@
 package org.example.service;
 
 import org.example.models.User;
+import org.example.models.enums.UserStatus;
 import org.example.repository.UserRepository;
+
+import java.util.List;
 
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
@@ -23,5 +26,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserById(Long id) {
         return userRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    @Override
+    public void changeStatus(Long userId, UserStatus status) {
+        userRepository.updateStatus(userId, status);
     }
 }

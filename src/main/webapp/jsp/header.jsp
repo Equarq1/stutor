@@ -14,6 +14,9 @@
                 <a href="${pageContext.request.contextPath}/my-offers">Мои объявления</a>
                 <a href="${pageContext.request.contextPath}/create-offer">Создать объявление</a>
                 <a href="${pageContext.request.contextPath}/requests">Заявки</a>
+                <c:if test="${sessionScope.user.role == 'ADMIN'}">
+                    <a href="${pageContext.request.contextPath}/admin/users">Админка</a>
+                </c:if>
             </nav>
 
             <div class="auth-menu">
