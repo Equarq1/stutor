@@ -11,7 +11,7 @@
             <label>Выберите предмет:</label>
             <select name="subjectId" required>
                 <c:forEach var="subject" items="${offer.subjects}">
-                    <option value="${subject.id}">${subject.name}</option>
+                    <option value="${subject.id}"><c:out value="${subject.name}"/></option>
                 </c:forEach>
             </select>
 
@@ -23,7 +23,7 @@
 
             <button type="submit">Отправить заявку</button>
             <c:if test="${not empty errorMessage}">
-                <div class="error-message">${errorMessage}</div>
+                <div class="error-message"><c:out value="${errorMessage}"/></div>
             </c:if>
         </form>
     </main>

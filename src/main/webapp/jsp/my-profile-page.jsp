@@ -14,23 +14,23 @@
                 </c:otherwise>
             </c:choose>
             <div class="profile-title">
-                <h2>${user.fullName}</h2>
-                <p>${user.email}</p>
+                <h2><c:out value="${user.fullName}"/></h2>
+                <p><c:out value="${user.email}"/></p>
             </div>
         </div>
 
         <div class="profile-info">
-            <p><strong>Город:</strong> ${not empty user.city ? user.city.name : 'Не указан'}</p>
-            <p><strong>Факультет:</strong> ${not empty user.group ? user.group.faculty.name : 'Не указан'}</p>
-            <p><strong>Группа:</strong> ${not empty user.group ? user.group.name : 'Не указана'}</p>
+            <p><strong>Город:</strong> <c:out value="${not empty user.city ? user.city.name : 'Не указан'}"/></p>
+            <p><strong>Факультет:</strong> <c:out value="${not empty user.group ? user.group.faculty.name : 'Не указан'}"/></p>
+            <p><strong>Группа:</strong> <c:out value="${not empty user.group ? user.group.name : 'Не указана'}"/></p>
         </div>
 
         <hr class="profile-divider">
         <h3>О себе</h3>
-        <p>${not empty user.about ? user.about : 'Вы еще ничего не рассказали о себе.'}</p>
+        <p><c:out value="${not empty user.about ? user.about : 'Вы еще ничего не рассказали о себе.'}"/></p>
 
         <h3>Контакты</h3>
-        <p>${not empty user.contact ? user.contact : 'Контакты не указаны.'}</p>
+        <p><c:out value="${not empty user.contact ? user.contact : 'Контакты не указаны.'}"/></p>
 
         <a href="${pageContext.request.contextPath}/profile/update" class="button">Редактировать профиль</a>
 
@@ -64,4 +64,4 @@
             </c:otherwise>
         </c:choose>
     </div>
-</t:layout>
+</t:layout> 

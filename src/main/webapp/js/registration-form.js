@@ -16,7 +16,10 @@ function loadGroups() {
                 groupSelect.append('<option value="" disabled selected>Выберите группу...</option>');
 
                 for (let i = 0; i < groups.length; i++) {
-                    groupSelect.append('<option value="' + groups[i].id + '">' + groups[i].name + '</option>');
+                    groupSelect.append($('<option>', {
+                        value: groups[i].id,
+                        text: groups[i].name
+                    }));
                 }
             },
             dataType: "json"

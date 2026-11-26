@@ -10,7 +10,7 @@
     </jsp:attribute>
     <jsp:body>
         <c:if test="${not empty errorMessage}">
-            <div class="error-message">${errorMessage}</div>
+            <div class="error-message"><c:out value="${errorMessage}"/></div>
         </c:if>
 
         <form action="${pageContext.request.contextPath}/registration" method="post">
@@ -21,7 +21,7 @@
             <select id="faculty-select" required>
                 <option value="" disabled selected>Выберите факультет...</option>
                 <c:forEach items="${faculties}" var="faculty">
-                    <option value="${faculty.id}">${faculty.name}</option>
+                    <option value="${faculty.id}"><c:out value="${faculty.name}"/></option>
                 </c:forEach>
             </select>
 
@@ -39,7 +39,7 @@
             <select name="cityId" required>
                 <option value="" disabled selected>Выберите город...</option>
                 <c:forEach items="${cities}" var="city">
-                    <option value="${city.id}">${city.name}</option>
+                    <option value="${city.id}"><c:out value="${city.name}"/></option>
                 </c:forEach>
             </select>
             <button type="submit">Зарегистрироваться</button>

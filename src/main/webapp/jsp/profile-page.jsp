@@ -14,18 +14,18 @@
                 </c:otherwise>
             </c:choose>
             <div class="profile-title">
-                <h2>${targetUser.fullName}</h2>
+                <h2><c:out value="${targetUser.fullName}"/></h2>
             </div>
         </div>
 
         <div class="profile-info">
-            <p><strong>Институт:</strong> ${not empty targetUser.group ? targetUser.group.faculty.name : 'Не указан'}</p>
+            <p><strong>Институт:</strong> <c:out value="${not empty targetUser.group ? targetUser.group.faculty.name : 'Не указан'}"/></p>
         </div>
 
         <hr class="profile-divider">
 
         <h3>О себе</h3>
-        <p>${not empty targetUser.about ? targetUser.about : 'Пользователь пока не добавил информацию о себе.'}</p>
+        <p><c:out value="${not empty targetUser.about ? targetUser.about : 'Пользователь пока не добавил информацию о себе.'}"/></p>
 
         <div class="contacts-placeholder">
             <p><em>Контакты будут доступны после того, как преподаватель примет вашу заявку на обучение.</em></p>

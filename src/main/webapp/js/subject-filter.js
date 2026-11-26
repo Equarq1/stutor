@@ -24,12 +24,16 @@ function loadSubjects() {
 
                 for (let i = 0; i < subjects.length; i++) {
                     if (container.find('input[value="' + subjects[i].id + '"]').length === 0) {
-                        container.append(
-                            '<label class="subject-chip">' +
-                            '<input type="checkbox" name="subjectIds" value="' + subjects[i].id + '">' +
-                            '<span>' + subjects[i].name + '</span>' +
-                            '</label>'
-                        );
+                        let label = $('<label>', {class: 'subject-chip'});
+                        let checkbox = $('<input>', {
+                            type: 'checkbox',
+                            name: 'subjectIds',
+                            value: subjects[i].id
+                        });
+                        let name = $('<span>', {text: subjects[i].name});
+
+                        label.append(checkbox, name);
+                        container.append(label);
                     }
                 }
             }

@@ -4,7 +4,7 @@
 
 <t:layout title="Вход">
     <c:if test="${not empty errorMessage}">
-        <div class="error-message">${errorMessage}</div>
+        <div class="error-message"><c:out value="${errorMessage}"/></div>
     </c:if>
 
     <form action="${pageContext.request.contextPath}/login" method="post">

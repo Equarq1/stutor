@@ -55,18 +55,6 @@ public class CustomServletContextListener implements ServletContextListener {
         RequestService requestService = new RequestServiceImpl(requestRepository);
         ReviewService reviewService = new ReviewServiceImpl(reviewRepository, requestRepository);
 
-        // Добавляем репозитории в контекст
-        servletContext.setAttribute("userRepository", userRepository);
-        servletContext.setAttribute("facultyRepository", facultyRepository);
-        servletContext.setAttribute("cityRepository", cityRepository);
-        servletContext.setAttribute("studyGroupRepository", studyGroupRepository);
-        servletContext.setAttribute("offerRepository", offerRepository);
-        servletContext.setAttribute("categoryRepository", categoryRepository);
-        servletContext.setAttribute("subjectRepository", subjectRepository);
-        servletContext.setAttribute("fileInfoRepository", fileInfoRepository);
-        servletContext.setAttribute("requestRepository", requestRepository);
-        servletContext.setAttribute("reviewRepository", reviewRepository);
-
         // Добавляем сервисы в контекст
         servletContext.setAttribute("authService", authService);
         servletContext.setAttribute("facultyService", facultyService);

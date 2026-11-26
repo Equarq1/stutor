@@ -4,7 +4,7 @@
 
 <t:layout title="${pageTitle}">
     <main>
-        <h2>${pageTitle}</h2>
+        <h2><c:out value="${pageTitle}"/></h2>
 
         <div class="requests-tabs">
             <a href="${pageContext.request.contextPath}/requests?type=outgoing">Мои отклики</a>
@@ -16,14 +16,14 @@
                 <c:when test="${not empty requests}">
                     <c:forEach var="reqInfo" items="${requests}">
                         <div class="card">
-                            <h3>На объявление: <a href="${pageContext.request.contextPath}/offer?id=${reqInfo.offer.id}">${reqInfo.offer.title}</a></h3>
-                            <p><strong>Предмет:</strong> ${reqInfo.subject.name}</p>
+                            <h3>На объявление: <a href="${pageContext.request.contextPath}/offer?id=${reqInfo.offer.id}"><c:out value="${reqInfo.offer.title}"/></a></h3>
+                            <p><strong>Предмет:</strong> <c:out value="${reqInfo.subject.name}"/></p>
 
                             <c:if test="${isIncoming}">
-                                <p><strong>От ученика:</strong> <a href="${pageContext.request.contextPath}/user?id=${reqInfo.student.id}">${reqInfo.student.fullName}</a></p>
+                                <p><strong>От ученика:</strong> <a href="${pageContext.request.contextPath}/user?id=${reqInfo.student.id}"><c:out value="${reqInfo.student.fullName}"/></a></p>
                             </c:if>
 
-                            <p><strong>Сообщение:</strong> ${reqInfo.message}</p>
+                            <p><strong>Сообщение:</strong> <c:out value="${reqInfo.message}"/></p>
                             <p><strong>Статус:</strong>
                                 <span class="status-${reqInfo.status}">
                                         ${reqInfo.status}
@@ -50,13 +50,13 @@
                             </c:if>
 
                             <c:if test="${isIncoming && reqInfo.status == 'ACCEPTED'}">
-                                <p><strong>Контакт ученика:</strong> ${reqInfo.student.contact}</p>
+                                <p><strong>Контакт ученика:</strong> <c:out value="${reqInfo.student.contact}"/></p>
                             </c:if>
 
                             <c:if test="${not isIncoming}">
                                 <p><strong>Репетитор:</strong>
                                     <a href="${pageContext.request.contextPath}/user?id=${reqInfo.offer.author.id}">
-                                            ${reqInfo.offer.author.fullName}
+                                        <c:out value="${reqInfo.offer.author.fullName}"/>
                                     </a>
                                 </p>
                             </c:if>
@@ -64,7 +64,7 @@
                             <c:if test="${not isIncoming and reqInfo.status == 'ACCEPTED'}">
                                 <p>
                                     <strong>Вам стали доступны контакты:</strong>
-                                        ${not empty reqInfo.offer.author.contact ? reqInfo.offer.author.contact : 'Репетитор не указал контакты, ждите пока он сам с вами свяжется или следите не появились ли контакты'}
+                                    <c:out value="${not empty reqInfo.offer.author.contact ? reqInfo.offer.author.contact : 'Репетитор не указал контакты, ждите пока он сам с вами свяжется или следите не появились ли контакты'}"/>
                                 </p>
                                 <a href="${pageContext.request.contextPath}/review/create?requestId=${reqInfo.id}" class="button">Оставить отзыв</a>
                             </c:if>

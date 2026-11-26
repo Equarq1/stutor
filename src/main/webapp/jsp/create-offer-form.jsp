@@ -10,7 +10,7 @@
     </jsp:attribute>
     <jsp:body>
         <c:if test="${not empty errorMessage}">
-            <div class="error-message">${errorMessage}</div>
+            <div class="error-message"><c:out value="${errorMessage}"/></div>
         </c:if>
 
         <form class="create-offer-form" action="${pageContext.request.contextPath}/create-offer" method="post" enctype="multipart/form-data">
@@ -28,7 +28,7 @@
             <input type="number" step="0.01" min="0" max="999999.99" class="price" name="price" placeholder="Введите цену" required>
             <select name="categoryId" required>
                 <c:forEach var="category" items="${categories}">
-                    <option value="${category.id}">${category.name}</option>
+                    <option value="${category.id}"><c:out value="${category.name}"/></option>
                 </c:forEach>
             </select>
 
@@ -39,7 +39,7 @@
                     <select id="faculty-select">
                         <option value="" disabled selected>Выберите институт...</option>
                         <c:forEach var="faculty" items="${faculties}">
-                            <option value="${faculty.id}">${faculty.name}</option>
+                            <option value="${faculty.id}"><c:out value="${faculty.name}"/></option>
                         </c:forEach>
                     </select>
 
